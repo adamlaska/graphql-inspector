@@ -18,7 +18,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "@graphql-inspector/core": "latest",
-    "@graphql-inspector/github": "latest",
+    "@graphql-inspector/github": "4.0.1",
     "@monaco-editor/react": "4.3.1",
     "react-flip-move": "3.0.4"
   },
