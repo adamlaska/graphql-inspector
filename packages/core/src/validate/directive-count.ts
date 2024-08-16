@@ -1,12 +1,12 @@
 import { DepGraph } from 'dependency-graph';
 import type {
   DocumentNode,
-  FragmentDefinitionNode,
-  Source,
   FieldNode,
+  FragmentDefinitionNode,
+  FragmentSpreadNode,
   InlineFragmentNode,
   OperationDefinitionNode,
-  FragmentSpreadNode,
+  Source,
 } from 'graphql';
 import { GraphQLError, Kind } from 'graphql';
 
@@ -21,7 +21,8 @@ export function validateDirectiveCount({
   maxDirectiveCount: number;
   fragmentGraph: DepGraph<FragmentDefinitionNode>;
 }): GraphQLError | void {
-  const getFragmentByFragmentName = (fragmentName: string) => fragmentGraph.getNodeData(fragmentName);
+  const getFragmentByFragmentName = (fragmentName: string) =>
+    fragmentGraph.getNodeData(fragmentName);
 
   for (const definition of doc.definitions) {
     if (definition.kind !== Kind.OPERATION_DEFINITION) {
@@ -33,26 +34,31 @@ export function validateDirectiveCount({
         `Too many directives (${directiveCount}). Maximum allowed is ${maxDirectiveCount}`,
         [definition],
         source,
-        definition.loc && definition.loc.start ? [definition.loc.start] : undefined
+        definition.loc?.start ? [definition.loc.start] : undefined,
       );
     }
   }
 }
 
 export function countDirectives(
-  node: FieldNode | FragmentDefinitionNode | InlineFragmentNode | OperationDefinitionNode | FragmentSpreadNode,
-  getFragmentByName: (fragmentName: string) => FragmentDefinitionNode | undefined
+  node:
+    | FieldNode
+    | FragmentDefinitionNode
+    | InlineFragmentNode
+    | OperationDefinitionNode
+    | FragmentSpreadNode,
+  getFragmentByName: (fragmentName: string) => FragmentDefinitionNode | undefined,
 ) {
   let directives = 0;
   if (node.directives) {
     directives += node.directives.length;
   }
   if ('selectionSet' in node && node.selectionSet) {
-    for (let child of node.selectionSet.selections) {
+    for (const child of node.selectionSet.selections) {
       directives += countDirectives(child, getFragmentByName);
     }
   }
-  if (node.kind == Kind.FRAGMENT_SPREAD) {
+  if (node.kind === Kind.FRAGMENT_SPREAD) {
     const fragment = getFragmentByName(node.name.value);
     if (fragment) {
       directives += countDirectives(fragment, getFragmentByName);

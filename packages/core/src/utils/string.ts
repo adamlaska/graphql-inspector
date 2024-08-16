@@ -25,20 +25,22 @@ function compareTwoStrings(str1: string, str2: string) {
   const pairs2 = wordLetterPairs(str2);
   const union = pairs1.length + pairs2.length;
   let intersection = 0;
-  pairs1.forEach(pair1 => {
+  for (const pair1 of pairs1) {
     for (let i = 0, pair2; (pair2 = pairs2[i]); i++) {
       if (pair1 !== pair2) continue;
       intersection++;
       pairs2.splice(i, 1);
       break;
     }
-  });
+  }
   return (intersection * 2) / union;
 }
 
 export function findBestMatch(mainString: string, targetStrings: Target[]): BestMatch {
   if (!areArgsValid(mainString, targetStrings))
-    throw new Error('Bad arguments: First argument should be a string, second should be an array of strings');
+    throw new Error(
+      'Bad arguments: First argument should be a string, second should be an array of strings',
+    );
   const ratings = targetStrings.map(target => ({
     target,
     rating: compareTwoStrings(mainString, target.value),
@@ -70,8 +72,11 @@ function wordLetterPairs(str: string) {
   return flattenDeep(pairs);
 }
 
-export function safeString(obj: any) {
+export function safeString(obj: unknown) {
+  if (typeof obj === 'string') {
+    return JSON.stringify(obj);
+  }
   return inspect(obj)
-    .replace(/\[Object\: null prototype\] /g, '')
+    .replace(/\[Object: null prototype\] /g, '')
     .replace(/(^')|('$)/g, '');
 }

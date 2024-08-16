@@ -1,11 +1,10 @@
-import { isObjectType, isInterfaceType, isEnumType, isInputObjectType } from 'graphql';
+import { isEnumType, isInputObjectType, isInterfaceType, isObjectType } from 'graphql';
+import { isDeprecated } from '../../utils/is-deprecated.js';
+import { parsePath } from '../../utils/path.js';
+import { ChangeType, CriticalityLevel } from '../changes/change.js';
+import { Rule } from './types.js';
 
-import { CriticalityLevel, ChangeType } from './../changes/change';
-import { Rule } from './types';
-import { parsePath } from '../../utils/path';
-import { isDeprecated } from '../../utils/isDeprecated';
-
-export const suppressRemovalOfDeprecatedField: Rule = ({ changes, oldSchema }) => {
+export const suppressRemovalOfDeprecatedField: Rule = ({ changes, oldSchema, newSchema }) => {
   return changes.map(change => {
     if (
       change.type === ChangeType.FieldRemoved &&
@@ -73,6 +72,25 @@ export const suppressRemovalOfDeprecatedField: Rule = ({ changes, oldSchema }) =
             },
           };
         }
+      }
+    }
+
+    if (
+      change.type === ChangeType.TypeRemoved &&
+      change.criticality.level === CriticalityLevel.Breaking &&
+      change.path
+    ) {
+      const [typeName] = parsePath(change.path);
+      const type = newSchema.getType(typeName);
+
+      if (!type) {
+        return {
+          ...change,
+          criticality: {
+            ...change.criticality,
+            level: CriticalityLevel.Dangerous,
+          },
+        };
       }
     }
 

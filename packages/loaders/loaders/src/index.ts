@@ -1,7 +1,12 @@
+import { buildSchema, GraphQLSchema } from 'graphql';
 import { InspectorConfig } from '@graphql-inspector/config';
-import { Source, Loader } from '@graphql-tools/utils';
-import { loadDocuments, loadSchema, LoadSchemaOptions, LoadTypedefsOptions } from '@graphql-tools/load';
-import { GraphQLSchema, buildSchema } from 'graphql';
+import {
+  loadDocuments,
+  loadSchema,
+  LoadSchemaOptions,
+  LoadTypedefsOptions,
+} from '@graphql-tools/load';
+import { Loader, Source } from '@graphql-tools/utils';
 
 export class LoadersRegistry {
   private loaders: Loader[] = [];
@@ -25,7 +30,7 @@ export class LoadersRegistry {
     pointer: string,
     options: Omit<LoadSchemaOptions, 'loaders'> = {},
     enableApolloFederation: boolean,
-    enableAWS: boolean
+    enableAWS: boolean,
   ): Promise<GraphQLSchema> {
     return enrichError(
       loadSchema(pointer, {
@@ -63,28 +68,35 @@ export class LoadersRegistry {
 
                   directive @aws_subscribe(mutations: [String!]!) on FIELD_DEFINITION
 
-                  directive @deprecated(reason: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ENUM | ENUM_VALUE
+                  directive @deprecated(
+                    reason: String
+                  ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ENUM | ENUM_VALUE
 
                   directive @aws_auth(cognito_groups: [String!]!) on FIELD_DEFINITION
                   directive @aws_api_key on FIELD_DEFINITION | OBJECT
                   directive @aws_iam on FIELD_DEFINITION | OBJECT
                   directive @aws_oidc on FIELD_DEFINITION | OBJECT
-                  directive @aws_cognito_user_pools(cognito_groups: [String!]) on FIELD_DEFINITION | OBJECT
+                  directive @aws_cognito_user_pools(
+                    cognito_groups: [String!]
+                  ) on FIELD_DEFINITION | OBJECT
                   directive @aws_lambda on FIELD_DEFINITION | OBJECT
                 `),
               ],
             }
           : {}),
-      })
+      }),
     );
   }
 
-  loadDocuments(pointer: string, options: Omit<LoadTypedefsOptions, 'loaders'> = {}): Promise<Source[]> {
+  loadDocuments(
+    pointer: string,
+    options: Omit<LoadTypedefsOptions, 'loaders'> = {},
+  ): Promise<Source[]> {
     return enrichError(
       loadDocuments(pointer, {
         loaders: this.loaders,
         ...options,
-      })
+      }),
     );
   }
 }
@@ -94,7 +106,7 @@ export type Loaders = Pick<LoadersRegistry, 'loadSchema' | 'loadDocuments'>;
 export function useLoaders(config: InspectorConfig): Loaders {
   const loaders = new LoadersRegistry();
 
-  config.loaders.forEach(loaderName => loaders.registerModule(loaderName));
+  for (const loaderName of config.loaders) loaders.registerModule(loaderName);
 
   return loaders;
 }
@@ -102,7 +114,7 @@ export function useLoaders(config: InspectorConfig): Loaders {
 function loadModule<T>(name: string): T {
   const mod = require(name);
 
-  return mod.default ? mod.default : mod;
+  return mod.default || mod;
 }
 
 /**

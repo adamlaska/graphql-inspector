@@ -1,12 +1,12 @@
 import { DepGraph } from 'dependency-graph';
 import type {
   DocumentNode,
-  FragmentDefinitionNode,
-  Source,
   FieldNode,
+  FragmentDefinitionNode,
+  FragmentSpreadNode,
   InlineFragmentNode,
   OperationDefinitionNode,
-  FragmentSpreadNode,
+  Source,
 } from 'graphql';
 import { GraphQLError, Kind } from 'graphql';
 
@@ -21,7 +21,8 @@ export function validateAliasCount({
   maxAliasCount: number;
   fragmentGraph: DepGraph<FragmentDefinitionNode>;
 }): GraphQLError | void {
-  const getFragmentByFragmentName = (fragmentName: string) => fragmentGraph.getNodeData(fragmentName);
+  const getFragmentByFragmentName = (fragmentName: string) =>
+    fragmentGraph.getNodeData(fragmentName);
 
   for (const definition of doc.definitions) {
     if (definition.kind !== Kind.OPERATION_DEFINITION) {
@@ -33,22 +34,27 @@ export function validateAliasCount({
         `Too many aliases (${aliasCount}). Maximum allowed is ${maxAliasCount}`,
         [definition],
         source,
-        definition.loc && definition.loc.start ? [definition.loc.start] : undefined
+        definition.loc?.start ? [definition.loc.start] : undefined,
       );
     }
   }
 }
 
 export function countAliases(
-  node: FieldNode | FragmentDefinitionNode | InlineFragmentNode | OperationDefinitionNode | FragmentSpreadNode,
-  getFragmentByName: (fragmentName: string) => FragmentDefinitionNode | undefined
+  node:
+    | FieldNode
+    | FragmentDefinitionNode
+    | InlineFragmentNode
+    | OperationDefinitionNode
+    | FragmentSpreadNode,
+  getFragmentByName: (fragmentName: string) => FragmentDefinitionNode | undefined,
 ) {
   let aliases = 0;
   if ('alias' in node && node.alias) {
     ++aliases;
   }
   if ('selectionSet' in node && node.selectionSet) {
-    for (let child of node.selectionSet.selections) {
+    for (const child of node.selectionSet.selections) {
       aliases += countAliases(child, getFragmentByName);
     }
   } else if (node.kind === Kind.FRAGMENT_SPREAD) {

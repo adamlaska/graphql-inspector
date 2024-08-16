@@ -4,8 +4,7 @@
     "baseUrl": ".",
     "rootDir": "packages",
     "outDir": "dist",
-
-    "target": "es2015",
+    "target": "ES2021",
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
@@ -22,7 +21,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "skipLibCheck": true,
-
+    "types": ["vitest/globals"],
     "paths": {
       "@graphql-inspector/core": ["packages/core/src/index.ts"],
       "@graphql-inspector/logger": ["packages/logger/src/index.ts"],
@@ -31,7 +30,6 @@
       "@graphql-inspector/config": ["packages/config/src/index.ts"],
       "@graphql-inspector/commands": ["packages/commands/commands/src/index.ts"],
       "@graphql-inspector/loaders": ["packages/loaders/loaders/src/index.ts"],
-      "@graphql-inspector/github": ["packages/github/src/index.ts"],
       "@graphql-inspector/action": ["packages/action/src/index.ts"],
       "@graphql-inspector/code-loader": ["packages/loaders/code/src/index.ts"],
       "@graphql-inspector/git-loader": ["packages/loaders/git/src/index.ts"],
@@ -50,5 +48,5 @@
     }
   },
   "include": ["packages"],
-  "exclude": ["**/dist", "**/node_modules/**", "**/__tests__", "**/tests", "packages/graphql-cli"]
+  "exclude": ["**/dist", "**/node_modules/**", "**/__tests__", "**/tests"]
 }

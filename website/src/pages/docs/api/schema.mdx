@@ -1,4 +1,7 @@
-import { Callout, Tabs, Tab } from '@theguild/components'
+---
+description: GraphQL Inspector - There are a few options to provide your schema in GraphQL Inspector.
+---
+import { Callout, Tabs } from '@theguild/components'
 
 # Providing Schema
 
@@ -9,7 +12,7 @@ There are a few options to provide your schema in GraphQL Inspector.
 GraphQL Inspector accepts CommonJS and ESModules
 
 <Tabs items={['CommonJS', 'ESM default export', 'ESM named export']}>
-<Tab>
+<Tabs.Tab>
 ```js
 // Example for loading and merging multiple .graphql files into a single schema
 const { makeExecutableSchema } = require('@graphql-tools/schema')
@@ -19,8 +22,8 @@ const typeDefs = loadFilesSync('**/*.graphql')
 
 module.exports = makeExecutableSchema({ typeDefs })
 ```
-</Tab>
-<Tab>
+</Tabs.Tab>
+<Tabs.Tab>
 ```ts
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { typeDefs } from './type-defs'
@@ -28,8 +31,8 @@ import { typeDefs } from './type-defs'
 // as `default`
 export default makeExecutableSchema({ typeDefs })
 ```
-</Tab>
-<Tab>
+</Tabs.Tab>
+<Tabs.Tab>
 ```ts
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { typeDefs } from './type-defs'
@@ -37,7 +40,7 @@ import { typeDefs } from './type-defs'
 // as `schema` variables
 export const schema = makeExecutableSchema({ typeDefs })
 ```
-</Tab>
+</Tabs.Tab>
 </Tabs>
 
 If you need to transpile a file, use `--require` option of the CLI:
@@ -103,7 +106,7 @@ For example, we want to fetch a .graphql file from master branch of
 github:kamilkisiela/graphql-inspector-example#master:./schema.graphql --token 'github-token-here'
 ```
 
-<Callout type="warning" emoji="⚠️">
+<Callout type="warning">
   GitHub Loader requires a GitHub token to be defined!
 </Callout>
 

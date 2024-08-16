@@ -1,12 +1,20 @@
+---
+description:
+  GraphQL Inspector Action checks your Pull Request to find breaking changes (and others) in a
+  GraphQL Schema, against your `master` branch.
+---
+
+import { Callout } from '@theguild/components'
+
 # GitHub Action
 
-[GraphQL Inspector Action](https://github.com/marketplace/actions/graphql-inspector) is a GitHub Action that you can
-install in any of your repositories.
+[GraphQL Inspector Action](https://github.com/marketplace/actions/graphql-inspector) is a GitHub
+Action that you can install in any of your repositories.
 
-GraphQL Inspector Action checks your Pull Request to find breaking changes (and others) in a GraphQL Schema, against
-your `master` branch.
+GraphQL Inspector Action checks your Pull Request to find breaking changes (and others) in a GraphQL
+Schema, against your `master` branch.
 
-![Application](../../../../public/assets/img/github/app-action.jpg)
+![Application](/assets/img/github/app-action.jpg)
 
 ## Usage
 
@@ -29,8 +37,12 @@ jobs:
           schema: 'master:schema.graphql'
 ```
 
-Now on every commit or every Pull Request, the GraphQL Inspector App will annotate every change, next to the line in the
-code where it happened.
+Now on every commit or every Pull Request, the GraphQL Inspector App will annotate every change,
+next to the line in the code where it happened.
+
+<Callout type="info">
+  Checks permission needs to be set to write access while running GitHub action.
+</Callout>
 
 ## Inputs
 
@@ -38,8 +50,8 @@ code where it happened.
 
 The name of the check (`GraphQL Inspector` by default).
 
-In case of multiple GraphQL Inspector Actions, use `name` to prevent GitHub from overwriting results. For example,
-"Check Public API" and "Check Internal API".
+In case of multiple GraphQL Inspector Actions, use `name` to prevent GitHub from overwriting
+results. For example, "Check Public API" and "Check Internal API".
 
 ```yaml
 - uses: kamilkisiela/graphql-inspector@master
@@ -77,8 +89,9 @@ Fail on breaking changes (`true` by default).
 
 ### `approve-label`
 
-Label to mark Pull Request introducing breaking changes as safe and expected By default, GraphQL Inspector fails the
-Pull Request when it detects any breaking changes (`approved-breaking-change` by default).
+Label to mark Pull Request introducing breaking changes as safe and expected By default, GraphQL
+Inspector fails the Pull Request when it detects any breaking changes (`approved-breaking-change` by
+default).
 
 ```yaml
 - uses: kamilkisiela/graphql-inspector@master
@@ -87,7 +100,8 @@ Pull Request when it detects any breaking changes (`approved-breaking-change` by
     approve-label: expected-breaking-change
 ```
 
-To mark the breaking change as safe, apply the `approved-breaking-change` label or define your own in `approve-label`.
+To mark the breaking change as safe, apply the `approved-breaking-change` label or define your own
+in `approve-label`.
 
 ### `endpoint`
 
@@ -109,6 +123,34 @@ If you want to use GraphQL API endpoint as source of "after" schema:
     endpoint: 'https://my-app.com/graphql'
 ```
 
+### `rules`
+
+Apply [rules](../essentials/diff#rules) included with the Inspector as well as your own
+[custom rules](../essentials/diff#custom-rules)
+
+```yaml
+- uses: kamilkisiela/graphql-inspector@master
+  with:
+    schema: 'master:schema.graphql'
+    rules: |
+      suppressRemovalOfDeprecatedField
+      custom-rule.js
+```
+
+### `onUsage`
+
+Must be used with the `rules` input. Required to apply the custom logic for the
+[`considerUsage`](../essentials/diff#considerusage) rule
+
+```yaml
+- uses: kamilkisiela/graphql-inspector@master
+  with:
+    schema: 'master:schema.graphql'
+    rules: |
+      considerUsage
+    onUsage: check-usage.js
+```
+
 ## Outputs
 
 Read
@@ -119,6 +161,6 @@ to see how to use outputs.
 
 Total number of changes
 
-![Summary](../../../../public/assets/img/github/summary.jpg)
+![Summary](/assets/img/github/summary.jpg)
 
-![Annotations](../../../../public/assets/img/cli/github.jpg)
+![Annotations](/assets/img/cli/github.jpg)

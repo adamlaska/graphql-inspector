@@ -1,3 +1,5 @@
+import { existsSync } from 'fs';
+import { GraphQLSchema } from 'graphql';
 import {
   CommandFactory,
   createCommand,
@@ -9,15 +11,13 @@ import {
   Change,
   CompletionArgs,
   CompletionHandler,
-  UsageHandler,
   CriticalityLevel,
-  diff as diffSchema,
   DiffRule,
+  diff as diffSchema,
   Rule,
+  UsageHandler,
 } from '@graphql-inspector/core';
 import { bolderize, Logger, symbols } from '@graphql-inspector/logger';
-import { existsSync } from 'fs';
-import { GraphQLSchema } from 'graphql';
 
 export { CommandFactory };
 
@@ -28,7 +28,9 @@ export async function handler(input: {
   onUsage?: string;
   rules?: Array<string | number>;
 }) {
-  const onComplete = input.onComplete ? resolveCompletionHandler(input.onComplete) : failOnBreakingChanges;
+  const onComplete = input.onComplete
+    ? resolveCompletionHandler(input.onComplete)
+    : failOnBreakingChanges;
 
   const rules = input.rules
     ? input.rules
@@ -37,7 +39,7 @@ export async function handler(input: {
           const rule = resolveRule(name);
 
           if (!rule) {
-            throw new Error(`\Rule '${name}' does not exist!\n`);
+            throw new Error(`Rule '${name}' does not exist!\n`);
           }
 
           return rule;
@@ -56,9 +58,15 @@ export async function handler(input: {
 
   Logger.log(`\nDetected the following changes (${changes.length}) between schemas:\n`);
 
-  const breakingChanges = changes.filter(change => change.criticality.level === CriticalityLevel.Breaking);
-  const dangerousChanges = changes.filter(change => change.criticality.level === CriticalityLevel.Dangerous);
-  const nonBreakingChanges = changes.filter(change => change.criticality.level === CriticalityLevel.NonBreaking);
+  const breakingChanges = changes.filter(
+    change => change.criticality.level === CriticalityLevel.Breaking,
+  );
+  const dangerousChanges = changes.filter(
+    change => change.criticality.level === CriticalityLevel.Dangerous,
+  );
+  const nonBreakingChanges = changes.filter(
+    change => change.criticality.level === CriticalityLevel.NonBreaking,
+  );
 
   if (breakingChanges.length) {
     reportBreakingChanges(breakingChanges);
@@ -127,12 +135,12 @@ export default createCommand<
         const { headers, leftHeaders, rightHeaders, token } = parseGlobalArgs(args);
 
         const oldSchemaHeaders = {
-          ...(headers ?? {}),
-          ...(leftHeaders ?? {}),
+          ...headers,
+          ...leftHeaders,
         };
         const newSchemaHeaders = {
-          ...(headers ?? {}),
-          ...(rightHeaders ?? {}),
+          ...headers,
+          ...rightHeaders,
         };
 
         const oldSchema = await loaders.loadSchema(
@@ -143,7 +151,7 @@ export default createCommand<
             method,
           },
           apolloFederation,
-          aws
+          aws,
         );
         const newSchema = await loaders.loadSchema(
           newSchemaPointer,
@@ -153,7 +161,7 @@ export default createCommand<
             method,
           },
           apolloFederation,
-          aws
+          aws,
         );
 
         await handler({
@@ -163,7 +171,7 @@ export default createCommand<
           onComplete: args.onComplete,
           onUsage: args.onUsage,
         });
-      } catch (error) {
+      } catch (error: any) {
         Logger.error(error);
         throw error;
       }
@@ -192,27 +200,27 @@ function reportBreakingChanges(changes: Change[]) {
   const label = symbols.error;
   const sorted = sortChanges(changes);
 
-  sorted.forEach(change => {
+  for (const change of sorted) {
     Logger.log(`${label}  ${bolderize(change.message)}`);
-  });
+  }
 }
 
 function reportDangerousChanges(changes: Change[]) {
   const label = symbols.warning;
   const sorted = sortChanges(changes);
 
-  sorted.forEach(change => {
+  for (const change of sorted) {
     Logger.log(`${label}  ${bolderize(change.message)}`);
-  });
+  }
 }
 
 function reportNonBreakingChanges(changes: Change[]) {
   const label = symbols.success;
   const sorted = sortChanges(changes);
 
-  sorted.forEach(change => {
+  for (const change of sorted) {
     Logger.log(`${label}  ${bolderize(change.message)}`);
-  });
+  }
 }
 
 function resolveRule(name: string): Rule | undefined {
@@ -246,7 +254,6 @@ function resolveUsageHandler(name: string): UsageHandler | never {
   } catch (error) {
     throw new Error(`UsageHandler '${name}' does not exist!`);
   }
-
   const mod = require(filepath);
 
   return mod?.default || mod;

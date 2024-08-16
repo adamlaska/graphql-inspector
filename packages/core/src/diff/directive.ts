@@ -1,23 +1,21 @@
-import { GraphQLDirective, GraphQLArgument } from 'graphql';
-
-import { isNotEqual } from '../utils/compare';
+import { GraphQLArgument, GraphQLDirective } from 'graphql';
+import { compareLists, diffArrays, isNotEqual } from '../utils/compare.js';
 import {
+  directiveArgumentAdded,
+  directiveArgumentDefaultValueChanged,
+  directiveArgumentDescriptionChanged,
+  directiveArgumentRemoved,
+  directiveArgumentTypeChanged,
   directiveDescriptionChanged,
   directiveLocationAdded,
   directiveLocationRemoved,
-  directiveArgumentAdded,
-  directiveArgumentRemoved,
-  directiveArgumentDescriptionChanged,
-  directiveArgumentDefaultValueChanged,
-  directiveArgumentTypeChanged,
-} from './changes/directive';
-import { diffArrays, compareLists } from '../utils/compare';
-import { AddChange } from './schema';
+} from './changes/directive.js';
+import { AddChange } from './schema.js';
 
 export function changesInDirective(
   oldDirective: GraphQLDirective,
   newDirective: GraphQLDirective,
-  addChange: AddChange
+  addChange: AddChange,
 ) {
   if (isNotEqual(oldDirective.description, newDirective.description)) {
     addChange(directiveDescriptionChanged(oldDirective, newDirective));
@@ -29,10 +27,12 @@ export function changesInDirective(
   };
 
   // locations added
-  locations.added.forEach(location => addChange(directiveLocationAdded(newDirective, location as any)));
+  for (const location of locations.added)
+    addChange(directiveLocationAdded(newDirective, location as any));
 
   // locations removed
-  locations.removed.forEach(location => addChange(directiveLocationRemoved(oldDirective, location as any)));
+  for (const location of locations.removed)
+    addChange(directiveLocationRemoved(oldDirective, location as any));
 
   compareLists(oldDirective.args, newDirective.args, {
     onAdded(arg) {
@@ -51,7 +51,7 @@ function changesInDirectiveArgument(
   directive: GraphQLDirective,
   oldArg: GraphQLArgument,
   newArg: GraphQLArgument,
-  addChange: AddChange
+  addChange: AddChange,
 ) {
   if (isNotEqual(oldArg.description, newArg.description)) {
     addChange(directiveArgumentDescriptionChanged(directive, oldArg, newArg));

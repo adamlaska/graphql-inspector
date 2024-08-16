@@ -1,23 +1,22 @@
 import { ReactElement } from 'react';
-import { FeatureList, HeroGradient, NPMBadge, HeroIllustration } from '@theguild/components';
-import dynamic from 'next/dynamic';
+import { FeatureList, HeroGradient, HeroIllustration, NPMBadge } from '@theguild/components';
+import { Diff } from './diff';
+import githubImage from '../../public/assets/img/illustrations/github.png';
+import hackerMindsetImage from '../../public/assets/img/illustrations/hacker-mindset.png';
 import hiveImage from '../../public/assets/img/illustrations/hive.png';
+import resultImage from '../../public/assets/img/illustrations/result.png';
+import typewritterImage from '../../public/assets/img/illustrations/typewriter.png';
+import coverImage from '../../public/assets/img/ui/cover.svg';
 import annotationsImage from '../../public/assets/img/ui/features/annotations.png';
+import interceptImage from '../../public/assets/img/ui/features/intercept.png';
 import notificationsImage from '../../public/assets/img/ui/features/notifications.png';
 import schemaCheckImage from '../../public/assets/img/ui/features/schema-check.png';
-import githubImage from '../../public/assets/img/illustrations/github.png';
-import resultImage from '../../public/assets/img/illustrations/result.png';
-import coverImage from '../../public/assets/img/ui/cover.svg';
-import typewritterImage from '../../public/assets/img/illustrations/typewriter.png';
-import hackerMindsetImage from '../../public/assets/img/illustrations/hacker-mindset.png';
-import interceptImage from '../../public/assets/img/ui/features/intercept.png';
 
-export const Diff = dynamic(() => import('./diff'));
-
-export const FEATURE_LIST = [
+const FEATURE_LIST = [
   {
     title: 'Works with GitHub',
-    description: `Start using our GitHub Application, setup everything within few clicks. Using GitHub workflows? Try out the GitHub Action.`,
+    description:
+      'Start using our GitHub Application, setup everything within few clicks. Using GitHub workflows? Try out the GitHub Action.',
     image: {
       src: githubImage,
       alt: 'GitHub',
@@ -32,7 +31,8 @@ export const FEATURE_LIST = [
   },
   {
     title: 'CI/CD',
-    description: `GraphQL Inspector can be used in any Continuous Integration service. Use our modularized, CI suited version of CLI.`,
+    description:
+      'GraphQL Inspector can be used in any Continuous Integration service. Use our modularized, CI suited version of CLI.',
     image: { src: resultImage, alt: 'CI', loading: 'eager' as const },
     linkProps: {
       children: 'Learn more',
@@ -42,7 +42,8 @@ export const FEATURE_LIST = [
   },
   {
     title: 'Command-Line',
-    description: `GraphQL Inspector offers a CLI that lets you analyze your GraphQL API but also client-side applications.`,
+    description:
+      'GraphQL Inspector offers a CLI that lets you analyze your GraphQL API but also client-side applications.',
     image: {
       src: typewritterImage,
       alt: 'CLI',
@@ -56,7 +57,8 @@ export const FEATURE_LIST = [
   },
   {
     title: 'Open Source',
-    description: `Our codebase is publicly available on GitHub and it's easy to deploy and use your GitHub Application.`,
+    description:
+      "Our codebase is publicly available on GitHub and it's easy to deploy and use your GitHub Application.",
     image: {
       src: hackerMindsetImage,
       alt: 'cli',
@@ -78,11 +80,11 @@ export function IndexPage(): ReactElement {
         title="GraphQL Inspector"
         description="Validate schemas and detect changes. Receive schema change notifications. Keep Operations and Fragments consistent."
         link={{
-          href: '/docs/introduction',
+          href: '/docs',
           children: 'Get Started',
           title: 'Get started with GraphQL Inspector Docs',
         }}
-        colors={['#2e2e2e', '#fff']}
+        colors={['#333', '#555']}
         version={<NPMBadge name="@graphql-inspector/cli" />}
         image={{
           src: coverImage,
@@ -92,7 +94,7 @@ export function IndexPage(): ReactElement {
         }}
       />
 
-      <FeatureList items={FEATURE_LIST} className={'dark:[&_img]:invert py-16'} />
+      <FeatureList items={FEATURE_LIST} className="dark:[&_img]:invert py-16" />
 
       <HeroIllustration
         title="GraphQL Hive"
@@ -107,13 +109,14 @@ export function IndexPage(): ReactElement {
           src: hiveImage,
           alt: 'GraphQL Hive',
           loading: 'lazy',
+          className: 'rounded-xl',
         }}
         link={{
           href: 'https://graphql-hive.com',
           children: 'Take me to GraphQL Hive',
           title: 'Visit GraphQL Hive',
         }}
-        className={'bg-gray-100 dark:bg-zinc-900'}
+        className="bg-gray-100 dark:bg-zinc-900"
         flipped
       />
 

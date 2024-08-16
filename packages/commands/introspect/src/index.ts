@@ -1,8 +1,18 @@
-import { createCommand, GlobalArgs, CommandFactory, parseGlobalArgs } from '@graphql-inspector/commands';
-import { Logger } from '@graphql-inspector/logger';
 import { writeFileSync } from 'fs';
-import { resolve, extname } from 'path';
-import { introspectionFromSchema, lexicographicSortSchema, printSchema, GraphQLSchema } from 'graphql';
+import { extname, resolve } from 'path';
+import {
+  GraphQLSchema,
+  introspectionFromSchema,
+  lexicographicSortSchema,
+  printSchema,
+} from 'graphql';
+import {
+  CommandFactory,
+  createCommand,
+  GlobalArgs,
+  parseGlobalArgs,
+} from '@graphql-inspector/commands';
+import { Logger } from '@graphql-inspector/logger';
 
 export { CommandFactory };
 
@@ -36,9 +46,7 @@ export function handler({
       throw new Error('Only .graphql, .gql and .json files are supported');
   }
 
-  writeFileSync(output, content!, {
-    encoding: 'utf-8',
-  });
+  writeFileSync(output, content!, 'utf8');
 
   Logger.success(`Saved to ${filepath}`);
 }
@@ -92,7 +100,7 @@ export default createCommand<
           method,
         },
         apolloFederation,
-        aws
+        aws,
       );
 
       return handler({ schema, output, comments });

@@ -1,12 +1,16 @@
-import { GraphQLObjectType } from 'graphql';
+import { GraphQLObjectType, Kind } from 'graphql';
+import { compareLists } from '../utils/compare.js';
+import { directiveUsageAdded, directiveUsageRemoved } from './changes/directive-usage.js';
+import { fieldAdded, fieldRemoved } from './changes/field.js';
+import { objectTypeInterfaceAdded, objectTypeInterfaceRemoved } from './changes/object.js';
+import { changesInField } from './field.js';
+import { AddChange } from './schema.js';
 
-import { objectTypeInterfaceAdded, objectTypeInterfaceRemoved } from './changes/object';
-import { fieldRemoved, fieldAdded } from './changes/field';
-import { changesInField } from './field';
-import { compareLists } from '../utils/compare';
-import { AddChange } from './schema';
-
-export function changesInObject(oldType: GraphQLObjectType, newType: GraphQLObjectType, addChange: AddChange) {
+export function changesInObject(
+  oldType: GraphQLObjectType,
+  newType: GraphQLObjectType,
+  addChange: AddChange,
+) {
   const oldInterfaces = oldType.getInterfaces();
   const newInterfaces = newType.getInterfaces();
 
@@ -31,6 +35,15 @@ export function changesInObject(oldType: GraphQLObjectType, newType: GraphQLObje
     },
     onMutual(f) {
       changesInField(oldType, f.oldVersion, f.newVersion, addChange);
+    },
+  });
+
+  compareLists(oldType.astNode?.directives || [], newType.astNode?.directives || [], {
+    onAdded(directive) {
+      addChange(directiveUsageAdded(Kind.OBJECT, directive, newType));
+    },
+    onRemoved(directive) {
+      addChange(directiveUsageRemoved(Kind.OBJECT, directive, oldType));
     },
   });
 }

@@ -1,6 +1,7 @@
+#!/usr/bin/env node
+import yargs, { Argv } from 'yargs';
 import { useCommands } from '@graphql-inspector/commands';
 import { useLoaders } from '@graphql-inspector/loaders';
-import yargs, { Argv } from 'yargs';
 
 async function main() {
   const config = {
@@ -43,6 +44,7 @@ async function main() {
       },
     });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   commands
     .reduce((cli, cmd) => cli.command(cmd), root)
     .help()

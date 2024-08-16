@@ -1,15 +1,15 @@
-import {
-  createCommand,
-  GlobalArgs,
-  ensureAbsolute,
-  parseGlobalArgs,
-  CommandFactory,
-} from '@graphql-inspector/commands';
-import { Logger, figures, chalk } from '@graphql-inspector/logger';
-import { similar as findSimilar, getTypePrefix, SimilarMap, Rating } from '@graphql-inspector/core';
+import { writeFileSync } from 'fs';
 import { extname } from 'path';
 import { GraphQLNamedType, GraphQLSchema } from 'graphql';
-import { writeFileSync } from 'fs';
+import {
+  CommandFactory,
+  createCommand,
+  ensureAbsolute,
+  GlobalArgs,
+  parseGlobalArgs,
+} from '@graphql-inspector/commands';
+import { similar as findSimilar, getTypePrefix, Rating, SimilarMap } from '@graphql-inspector/core';
+import { chalk, figures, Logger } from '@graphql-inspector/logger';
 
 export { CommandFactory };
 
@@ -29,48 +29,45 @@ export function handler({
 
   if (!Object.keys(similarMap).length) {
     Logger.info('No similar types found');
-  } else {
-    for (const typeName in similarMap) {
-      if (similarMap.hasOwnProperty(typeName)) {
-        const matches = similarMap[typeName];
-        const prefix = getTypePrefix(schema.getType(typeName) as GraphQLNamedType);
-        const sourceType = chalk.bold(typeName);
-        const name = matches.bestMatch.target.typeId;
+    return;
+  }
+  for (const typeName in similarMap) {
+    if (Object.prototype.hasOwnProperty.call(similarMap, typeName)) {
+      const matches = similarMap[typeName];
+      const prefix = getTypePrefix(schema.getType(typeName) as GraphQLNamedType);
+      const sourceType = chalk.bold(typeName);
+      const name = matches.bestMatch.target.typeId;
 
-        Logger.log('');
-        Logger.log(`${prefix} ${sourceType}`);
-        Logger.log(printResult(name, matches.bestMatch.rating));
+      Logger.log('');
+      Logger.log(`${prefix} ${sourceType}`);
+      Logger.log(printResult(name, matches.bestMatch.rating));
 
-        matches.ratings.forEach(match => {
-          Logger.log(printResult(match.target.typeId, match.rating));
-        });
+      for (const match of matches.ratings) {
+        Logger.log(printResult(match.target.typeId, match.rating));
       }
     }
+  }
 
-    if (shouldWrite) {
-      if (typeof writePath !== 'string') {
-        throw new Error(`--write is not valid file path: ${writePath}`);
-      }
+  if (shouldWrite) {
+    if (typeof writePath !== 'string') {
+      throw new Error(`--write is not valid file path: ${writePath}`);
+    }
 
-      const absPath = ensureAbsolute(writePath);
-      const ext = extname(absPath).replace('.', '').toLocaleLowerCase();
+    const absPath = ensureAbsolute(writePath);
+    const ext = extname(absPath).replace('.', '').toLocaleLowerCase();
 
-      let output: string | undefined = undefined;
-      const results = transformMap(similarMap);
+    let output: string | undefined = undefined;
+    const results = transformMap(similarMap);
 
-      if (ext === 'json') {
-        output = outputJSON(results);
-      }
+    if (ext === 'json') {
+      output = outputJSON(results);
+    }
 
-      if (output) {
-        writeFileSync(absPath, output, {
-          encoding: 'utf-8',
-        });
-
-        Logger.success(`Available at ${absPath}\n`);
-      } else {
-        throw new Error(`Extension ${ext} is not supported`);
-      }
+    if (output) {
+      writeFileSync(absPath, output, 'utf8');
+      Logger.success(`Available at ${absPath}\n`);
+    } else {
+      throw new Error(`Extension ${ext} is not supported`);
     }
   }
 }
@@ -131,7 +128,7 @@ export default createCommand<
           method,
         },
         apolloFederation,
-        aws
+        aws,
       );
 
       return handler({ schema, writePath, type, threshold });
@@ -156,7 +153,7 @@ function transformMap(similarMap: SimilarMap): SimilarResults {
   const results: SimilarResults = {};
 
   for (const typename in similarMap) {
-    if (similarMap.hasOwnProperty(typename)) {
+    if (Object.prototype.hasOwnProperty.call(similarMap, typename)) {
       const result = similarMap[typename];
 
       results[typename] = [];
